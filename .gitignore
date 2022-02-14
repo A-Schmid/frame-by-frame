@@ -2,6 +2,9 @@
 input_data/*
 !input_data/test/
 
+# Prevent from uploading processed videos
+videos_processed/
+
 # Prevent from uploading .DS_Store
 *.DS_Store
 
