@@ -47,3 +47,6 @@ spreadsheets
 
 # experimental
 x.*
+
+*.swp
+*.swo
