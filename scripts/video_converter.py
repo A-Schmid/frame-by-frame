@@ -9,6 +9,13 @@ from pathlib import Path
 # 1. return dataframe with videos?
 # 2. support other video formats than mp4?
 
+def get_frame_count(video_path):
+    # source: Rosario Scavo (CodeHunter) - https://www.codegrepper.com/code-examples/python/python+ffmpeg+get+video+fps
+    probe = ffmpeg.probe(video_path)
+    video_info = next(s for s in probe['streams'] if s['codec_type'] == 'video')
+    fps = int(video_info['nb_frames'].split('/')[0])
+    return fps
+
 def convert_video(video_path, video_output_path, keep_audio=False, video_fps=25, overwrite=True):
     # if not in overwrite mode: skip
     if os.path.exists(video_output_path):
@@ -32,6 +39,7 @@ def convert_video(video_path, video_output_path, keep_audio=False, video_fps=25,
 
 def convert_videos(input_path, output_path, keep_audio=False, video_fps=25, overwrite=True):
     video_list = []
+    # maybe dataframe is the better idea?
     for path, subdirs, files in os.walk(input_path):
         for name in files:
             if name[-3:] == 'mp4':
@@ -39,7 +47,8 @@ def convert_videos(input_path, output_path, keep_audio=False, video_fps=25, over
                 video_path = f'{input_path}/{category}/{name}'
                 video_output_path = f'{output_path}/{category}/{name}'
                 convert_video(video_path, video_output_path, keep_audio, video_fps, overwrite)
-                video_list.append({'path' : video_output_path, 'name' : name.rsplit('.', 1)[0], 'category' : category})
+                frame_count = get_frame_count(video_output_path)
+                video_list.append({'path' : video_output_path, 'num_frames' : frame_count, 'name' : name.rsplit('.', 1)[0], 'category' : category})
     return video_list
 
 if __name__ == '__main__':
