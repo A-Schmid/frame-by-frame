@@ -1,6 +1,7 @@
 # Prevent from uploading MIT_sampleVideos_RAW folder
 input_data/*
 !input_data/test/
+data/
 
 # Prevent from uploading processed videos
 videos_processed/
@@ -53,3 +54,4 @@ x.*
 
 *.swp
 *.swo
+.ipynb_checkpoints
