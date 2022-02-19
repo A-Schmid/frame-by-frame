@@ -12,7 +12,7 @@ from pathlib import Path
 def convert_video(video_path, video_output_path, keep_audio=False, video_fps=25, overwrite=True):
     # if not in overwrite mode: skip
     if os.path.exists(video_output_path):
-        if not overwrite:
+        if overwrite == False:
             return False
 
     # create output dir if it does not exist
@@ -31,13 +31,16 @@ def convert_video(video_path, video_output_path, keep_audio=False, video_fps=25,
     return True
 
 def convert_videos(input_path, output_path, keep_audio=False, video_fps=25, overwrite=True):
+    video_list = []
     for path, subdirs, files in os.walk(input_path):
         for name in files:
             if name[-3:] == 'mp4':
                 category = path.split('/')[-1]
                 video_path = f'{input_path}/{category}/{name}'
                 video_output_path = f'{output_path}/{category}/{name}'
-                convert_video(video_path, video_output_path)
+                convert_video(video_path, video_output_path, keep_audio, video_fps, overwrite)
+                video_list.append({'path' : video_output_path, 'name' : name.rsplit('.', 1)[0], 'category' : category})
+    return video_list
 
 if __name__ == '__main__':
     if len(sys.argv) > 4:
