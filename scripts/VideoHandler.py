@@ -50,8 +50,13 @@ class VideoHandler():
         for handler in VideoHandler.handlers.values():
             if handler.get_category() == category:
                 result.append(handler.get_probabilities())
-        df = pd.DataFrame(result).mean().to_dict()
-        return df
+
+        df = pd.DataFrame(result)
+        df = df.reindex(sorted(df.columns), axis=1)
+        df = df.mean()
+        df['category'] = category
+
+        return df.to_dict()
 
 
     def __init__(self, category, name):
