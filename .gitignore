@@ -2,6 +2,7 @@
 input_data/*
 !input_data/test/
 data/
+video_data/
 
 # Prevent from uploading processed videos
 videos_processed/
