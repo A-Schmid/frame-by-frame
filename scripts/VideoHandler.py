@@ -1,8 +1,30 @@
 import config
 import video_converter
 from glob import glob
+import os
 import numpy as np
 import pandas as pd
+
+def get_processed_videos(path=config.RESULT_PATH):
+    categories = os.listdir(path)
+    result = []
+
+    for category in categories:
+        files = os.listdir(f'{path}/{category}')
+        names = []
+        for f in files:
+            name = f.split('_frame')[0]
+            if name not in names:
+                names.append(name)
+        for name in names:
+            result.append({'name' : name, 'category' : category})
+    return result
+
+def handlers_to_df(handlers):
+    df = pd.DataFrame(columns=['name', 'file_id', 'frame_count', 'category', 'accuracy'])
+    for handler in handlers:
+        df = df.append(handler.to_dict(), ignore_index=True)
+    return df
 
 class VideoHandler():
 
@@ -20,13 +42,22 @@ class VideoHandler():
         file_id = name.split('_')[-1]
         self.set_file_id(file_id)
 
-        print(len(self.data.index))
-        print(self.data.head())
+        #print(len(self.data.index))
+        #print(self.data.head())
 
         #if os.path.exists(f'{result_path}/{category}/{name}_frame_{frame_index:03d}.csv'):
 
         #self.df = pd.DataFrame(columns=['frame', 'action', 'probability'])
         pass
+
+    def to_dict(self):
+        result = dict()
+        result['name'] = self.get_name()
+        result['file_id'] = self.get_file_id()
+        result['frame_count'] = self.get_frame_count()
+        result['category'] = self.get_category()
+        result['accuracy'] = self.get_total_accuracy()
+        return result
 
     def set_category(self, category):
         self._category = category
@@ -46,6 +77,12 @@ class VideoHandler():
 
     def get_category(self):
         return self._category
+
+    def get_file_id(self):
+        return self.file_id
+
+    def get_name(self):
+        return self.name
 
     #def get_accuracies(self):
     #    df = self.data[self.data['action'] == self._category]
