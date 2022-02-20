@@ -33,7 +33,7 @@ class VideoHandler():
     video_data = pd.DataFrame(columns=['name', 'file_id', 'frame_count', 'category', 'accuracy'])
 
     def get_categories():
-        return list(VideoHandler.video_data['category'].unique())
+        return sorted(list(VideoHandler.video_data['category'].unique()))
 
     # returns a list of accuracies of all videos in the given category
     def get_accuracy_for_category(category):
