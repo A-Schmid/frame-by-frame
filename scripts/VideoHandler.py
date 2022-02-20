@@ -26,7 +26,7 @@ class VideoHandler():
         pass
 
     def set_category(self, category):
-        self.category = category
+        self._category = category
 
     def set_name(self, name):
         self.name = name
@@ -41,8 +41,11 @@ class VideoHandler():
     def get_frame_count(self):
         return self._frame_count
 
+    def get_category(self):
+        return self._category
+
     #def get_accuracies(self):
-    #    df = self.data[self.data['action'] == self.category]
+    #    df = self.data[self.data['action'] == self._category]
     #    return list(df['probabilities'])
 
     def load_config(self):
@@ -80,7 +83,7 @@ class VideoHandler():
 
     # returns the most important frame for specified file
     def get_mif(self, method=''):
-        df = self.data[self.data['action'] == self.category]
+        df = self.data[self.data['action'] == self._category]
         mif_row = df.loc[df['probability'] == df['probability'].max()]
         mif = mif_row['frame'].values[0]
         return mif
