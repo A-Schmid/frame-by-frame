@@ -90,7 +90,7 @@ def calculate_probabilities(video, result_path=config.RESULT_PATH):
             except:
                 pass
             df = df.append({'frame' : frame_index, 'action' : categories[idx[category_index]], 'probability' : probabilities.data.numpy()[category_index]}, ignore_index=True)
-        df.to_csv(f'{result_path}/{video["category"]}/{video["name"]}_frame_{frame_index:03d}.csv')
+        df.to_csv(f'{result_path}/{video["category"]}/{video["name"]}_frame_{frame_index:03d}.csv', index=False)
 
 
 print('doing magic...')
