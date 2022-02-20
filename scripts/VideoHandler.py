@@ -20,13 +20,39 @@ def get_processed_videos(path=config.RESULT_PATH):
             result.append({'name' : name, 'category' : category})
     return result
 
-def handlers_to_df(handlers):
-    df = pd.DataFrame(columns=['name', 'file_id', 'frame_count', 'category', 'accuracy'])
-    for handler in handlers:
-        df = df.append(handler.to_dict(), ignore_index=True)
-    return df
+#def handlers_to_df(handlers):
+#    df = pd.DataFrame(columns=['name', 'file_id', 'frame_count', 'category', 'accuracy'])
+#    for handler in handlers:
+#        df = df.append(handler.to_dict(), ignore_index=True)
+#    return df
 
 class VideoHandler():
+
+    # might perform poorly with large data set
+    handlers = dict()
+    video_data = pd.DataFrame(columns=['name', 'file_id', 'frame_count', 'category', 'accuracy'])
+
+    def get_categories():
+        return list(VideoHandler.video_data['category'].unique())
+
+    # returns a list of accuracies of all videos in the given category
+    def get_accuracy_for_category(category):
+        result = []
+        for handler in VideoHandler.handlers.values():
+            if handler.get_category() == category:
+                result.append(handler.get_total_accuracy())
+        return result
+
+    # averages probabilites for each action for videos with the given category
+    # this one is needed for softmax_rdm
+    def get_probability_vector_for_category(category):
+        result = []
+        for handler in VideoHandler.handlers.values():
+            if handler.get_category() == category:
+                result.append(handler.get_probabilities())
+        df = pd.DataFrame(result).mean().to_dict()
+        return df
+
 
     def __init__(self, category, name):
         self.load_config()
@@ -48,7 +74,9 @@ class VideoHandler():
         #if os.path.exists(f'{result_path}/{category}/{name}_frame_{frame_index:03d}.csv'):
 
         #self.df = pd.DataFrame(columns=['frame', 'action', 'probability'])
-        pass
+
+        VideoHandler.video_data = VideoHandler.video_data.append(self.to_dict(), ignore_index=True)
+        VideoHandler.handlers[self.get_file_id()] = self
 
     def to_dict(self):
         result = dict()
@@ -84,9 +112,14 @@ class VideoHandler():
     def get_name(self):
         return self.name
 
-    #def get_accuracies(self):
-    #    df = self.data[self.data['action'] == self._category]
-    #    return list(df['probabilities'])
+    def get_probabilities(self):
+        #df = self.data[self.data['action'] == self._category]
+        #return list(df['probabilities'])
+        result = dict()
+        for category in self.data['action'].unique():
+            result[category] = self.data[self.data['action'] == category]['probability'].mean()
+        return result
+
 
     # get accuracy for the whole video
     # accuracies for all frames are averaged with the passed method (default: mean)
