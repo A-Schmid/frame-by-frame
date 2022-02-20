@@ -8,8 +8,11 @@ class VideoHandler():
 
     def __init__(self, category, name, file_id=0):
         self.load_config()
+        self.set_category(category)
+        self.set_name(name)
 
         paths = sorted(glob(f'{self.result_path}/{category}/{name}_frame_*.csv'))
+        self._frame_count = len(paths)
 
         self.data = pd.concat([pd.read_csv(f) for f in paths])
         self.set_file_id(file_id)
@@ -22,12 +25,25 @@ class VideoHandler():
         #self.df = pd.DataFrame(columns=['frame', 'action', 'probability'])
         pass
 
+    def set_category(self, category):
+        self.category = category
+
+    def set_name(self, name):
+        self.name = name
+
     def set_file_id(self, file_id):
         self.file_id = file_id
         self.data['file'] = file_id
 
     def set_result_path(self, result_path):
         self.result_path = result_path
+
+    def get_frame_count(self):
+        return self._frame_count
+
+    #def get_accuracies(self):
+    #    df = self.data[self.data['action'] == self.category]
+    #    return list(df['probabilities'])
 
     def load_config(self):
         self.set_result_path(config.RESULT_PATH)
@@ -54,14 +70,24 @@ class VideoHandler():
         # not sure what it's comparing - better ask the experts
         pass
 
+    def get_frame_data(self, frame):
+        # todo exception handling
+        #  * frame not in number of frames
+        if frame < 0 or frame >= self._frame_count:
+            return None
+
+        return self.data[self.data['frame'] == frame]
+
     # returns the most important frame for specified file
-    def get_mif(self, file_id, method):
-        mif = 0
+    def get_mif(self, method=''):
+        df = self.data[self.data['action'] == self.category]
+        mif_row = df.loc[df['probability'] == df['probability'].max()]
+        mif = mif_row['frame'].values[0]
         return mif
 
     # trains the model
-    def train(self):
-        pass
+    #def train(self):
+    #    pass
 
     # gets segment with specified length around mif
     # can use different algorithms:
