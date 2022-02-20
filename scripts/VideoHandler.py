@@ -6,7 +6,7 @@ import pandas as pd
 
 class VideoHandler():
 
-    def __init__(self, category, name, file_id=0):
+    def __init__(self, category, name):
         self.load_config()
         self.set_category(category)
         self.set_name(name)
@@ -17,6 +17,7 @@ class VideoHandler():
 
         # create data frame for the video by concatenating data for all frames
         self.data = pd.concat([pd.read_csv(f) for f in paths])
+        file_id = name.split('_')[-1]
         self.set_file_id(file_id)
 
         print(len(self.data.index))
