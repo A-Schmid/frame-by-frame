@@ -7,13 +7,7 @@ from video_converter import convert_videos
 import config
 #from util import get_video_list
 
-from model import calculate_probabilities
-
-def load_categories(label_path):
-    """Load categories."""
-    with open(label_path) as f:
-        return [line.rstrip() for line in f.readlines()]
-
+from model import calculate_probabilities, load_categories
 
 def process_video(video, result_path=config.RESULT_PATH, process=calculate_probabilities):
     reader = VideoReader(video['path'])

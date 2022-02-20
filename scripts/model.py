@@ -6,6 +6,11 @@ import decord
 
 import config
 
+def load_categories(label_path):
+    """Load categories."""
+    with open(label_path) as f:
+        return [line.rstrip() for line in f.readlines()]
+
 decord.bridge.set_bridge('native')
 
 cuda_on = config.CUDA_ON
