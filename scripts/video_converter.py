@@ -44,11 +44,12 @@ def convert_videos(input_path, output_path, keep_audio=False, video_fps=25, over
         for name in files:
             if name[-3:] == 'mp4':
                 category = path.split('/')[-1]
+                file_id = name[:-4].split('_')[-1]
                 video_path = f'{input_path}/{category}/{name}'
                 video_output_path = f'{output_path}/{category}/{name}'
                 convert_video(video_path, video_output_path, keep_audio, video_fps, overwrite)
                 frame_count = get_frame_count(video_output_path)
-                video_list.append({'path' : video_output_path, 'num_frames' : frame_count, 'name' : name.rsplit('.', 1)[0], 'category' : category})
+                video_list.append({'path' : video_output_path, 'file_id' : file_id,'num_frames' : frame_count, 'name' : name.rsplit('.', 1)[0], 'category' : category})
     return video_list
 
 if __name__ == '__main__':
