@@ -1,51 +1,24 @@
 import config
-import video_converter
 from glob import glob
 import os
 import numpy as np
 import pandas as pd
-import subprocess
 
-from time import perf_counter
-
-# about 4 ms on lab server
 def get_processed_videos(path=config.RESULT_PATH):
     categories = os.listdir(path)
     result = []
 
-    #print(subprocess.Popen(['pwd'], stdout=subprocess.PIPE,).stdout)
-
     for category in categories:
-        #files = paths = glob(f'{path}/{category}/*_frame_000.csv')
         files = [f for f in os.listdir(f'{path}/{category}')]
-
-        #files = subprocess.Popen(f'ls {path}/{category}/*_frame_000.csv', shell=True, stdout=subprocess.PIPE,).stdout
-        #files = subprocess.Popen(['ls'], stdout=subprocess.PIPE,).stdout
-
         names = []
+
         for f in files:
-            #name = f.split('/')[-1].split('_frame')[0]
             name = str(f).split('.')[0]
-
-            #names.append(name)
-
             result.append({'name' : name, 'category' : category})
-
-            #if name not in names:
-            #    names.append(name)
-        #for name in names:
-        #    result.append({'name' : name, 'category' : category})
 
     return result
 
-#def handlers_to_df(handlers):
-#    df = pd.DataFrame(columns=['name', 'file_id', 'frame_count', 'category', 'accuracy'])
-#    for handler in handlers:
-#        df = df.append(handler.to_dict(), ignore_index=True)
-#    return df
-
 class VideoHandler():
-
     counter = 0
 
     # might perform poorly with large data set
@@ -74,10 +47,6 @@ class VideoHandler():
         for video in videos.values:
             result.append(VideoHandler.handlers[video].get_probabilities())
 
-        #for handler in VideoHandler.handlers.values():
-        #    if handler.get_category() == category:
-        #        result.append(handler.get_probabilities())
-
         df = pd.DataFrame(result)
         df = df.reindex(sorted(df.columns), axis=1)
         df = df.mean()
@@ -91,33 +60,20 @@ class VideoHandler():
         self.set_category(category)
         self.set_name(name)
 
+        # read video data
         self.data = pd.read_csv(f'{self.result_path}/{category}/{name}.csv', dtype={'frame' : 'int8', 'action' : 'category'})
         self._frame_count = self.data['frame'].max()
 
+        # file ID is currently static and only based on the order VideoHandler objects are created
+        # Todo: make it an argument and use IDs from file list
         self.set_file_id(VideoHandler.counter)
 
-        # get list of csv files for the video
-        #paths = sorted(glob(f'{self.result_path}/{category}/{name}_frame_*.csv'))
-        #self._frame_count = len(paths)
-
-        # create data frame for the video by concatenating data for all frames
-        # this step takes 100-150 ms on the lab server
-        #self.data = pd.concat([pd.read_csv(f, dtype={'file_id' : 'int16', 'action' : 'category'}) for f in paths])
-
-        #file_id = name.split('_')[-1]
-        #self.set_file_id(file_id)
-
-        #print(len(self.data.index))
-        #print(self.data.head())
-
-        #if os.path.exists(f'{result_path}/{category}/{name}_frame_{frame_index:03d}.csv'):
-
-        #self.df = pd.DataFrame(columns=['frame', 'action', 'probability'])
-
+        # set static variables
         VideoHandler.video_data = VideoHandler.video_data.append(self.to_dict(), ignore_index=True)
         VideoHandler.handlers[self.get_file_id()] = self
         VideoHandler.counter += 1
 
+    # returns summary of the VideoHandler object as a dict
     def to_dict(self):
         result = dict()
         result['name'] = self.get_name()
