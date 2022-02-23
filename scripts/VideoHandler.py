@@ -4,20 +4,37 @@ from glob import glob
 import os
 import numpy as np
 import pandas as pd
+import subprocess
+
+from time import perf_counter
 
 def get_processed_videos(path=config.RESULT_PATH):
     categories = os.listdir(path)
     result = []
 
+    #print(subprocess.Popen(['pwd'], stdout=subprocess.PIPE,).stdout)
+
     for category in categories:
-        files = os.listdir(f'{path}/{category}')
+        #files = paths = glob(f'{path}/{category}/*_frame_000.csv')
+        files = [f for f in os.listdir(f'{path}/{category}') if '_frame_000' in f]
+
+        #files = subprocess.Popen(f'ls {path}/{category}/*_frame_000.csv', shell=True, stdout=subprocess.PIPE,).stdout
+        #files = subprocess.Popen(['ls'], stdout=subprocess.PIPE,).stdout
+
         names = []
         for f in files:
-            name = f.split('_frame')[0]
-            if name not in names:
-                names.append(name)
-        for name in names:
+            #name = f.split('/')[-1].split('_frame')[0]
+            name = str(f).split('_frame')[0]
+
+            #names.append(name)
+
             result.append({'name' : name, 'category' : category})
+
+            #if name not in names:
+            #    names.append(name)
+        #for name in names:
+        #    result.append({'name' : name, 'category' : category})
+
     return result
 
 #def handlers_to_df(handlers):
@@ -28,6 +45,8 @@ def get_processed_videos(path=config.RESULT_PATH):
 
 class VideoHandler():
 
+    counter = 0
+
     # might perform poorly with large data set
     handlers = dict()
     video_data = pd.DataFrame(columns=['name', 'file_id', 'frame_count', 'category', 'accuracy'])
@@ -36,6 +55,7 @@ class VideoHandler():
         return sorted(list(VideoHandler.video_data['category'].unique()))
 
     # returns a list of accuracies of all videos in the given category
+    # Todo: make param a list (example: get all sports-related things) 
     def get_accuracy_for_category(category):
         result = []
         for handler in VideoHandler.handlers.values():
@@ -47,9 +67,15 @@ class VideoHandler():
     # this one is needed for softmax_rdm
     def get_probability_vector_for_category(category):
         result = []
-        for handler in VideoHandler.handlers.values():
-            if handler.get_category() == category:
-                result.append(handler.get_probabilities())
+
+        videos = VideoHandler.video_data[VideoHandler.video_data['category'] == category]['file_id']
+
+        for video in videos.values:
+            result.append(VideoHandler.handlers[video].get_probabilities())
+
+        #for handler in VideoHandler.handlers.values():
+        #    if handler.get_category() == category:
+        #        result.append(handler.get_probabilities())
 
         df = pd.DataFrame(result)
         df = df.reindex(sorted(df.columns), axis=1)
@@ -69,9 +95,12 @@ class VideoHandler():
         self._frame_count = len(paths)
 
         # create data frame for the video by concatenating data for all frames
-        self.data = pd.concat([pd.read_csv(f) for f in paths])
-        file_id = name.split('_')[-1]
-        self.set_file_id(file_id)
+        # this step takes 100-150 ms on the lab server
+        self.data = pd.concat([pd.read_csv(f, dtype={'file_id' : 'int16', 'action' : 'category'}) for f in paths])
+
+        #file_id = name.split('_')[-1]
+        #self.set_file_id(file_id)
+        self.set_file_id(VideoHandler.counter)
 
         #print(len(self.data.index))
         #print(self.data.head())
@@ -82,6 +111,8 @@ class VideoHandler():
 
         VideoHandler.video_data = VideoHandler.video_data.append(self.to_dict(), ignore_index=True)
         VideoHandler.handlers[self.get_file_id()] = self
+        VideoHandler.counter += 1
+
 
     def to_dict(self):
         result = dict()
