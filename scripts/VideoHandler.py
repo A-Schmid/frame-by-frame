@@ -163,19 +163,51 @@ class VideoHandler():
 
     # returns the most important frame for specified file
     # Todo: split up into multiple private functions as more methods are added
-    def get_mif(self, method=''):
+    def get_mif(self):
         df = self.data[self.data['action'] == self._category]
         mif_row = df.loc[df['probability'] == df['probability'].max()]
         mif = mif_row['frame'].values[0]
         return mif
 
-    # trains the model
-    #def train(self):
-    #    pass
+    # maybe move to util?
+    def _shift_segment(self, segment):
+        (start, end) = segment
+        underflow = 0 - start
+        overflow = (self.get_frame_count() - 1) - end
+
+        if underflow > 0:
+            end += underflow
+            start = 0
+        elif overflow > 0:
+            end = self.get_frame_count() - 1
+            start -= overflow
+
+        return (start, end)
 
     # gets segment with specified length around mif
     # can use different algorithms:
     #  * mif in the beginning/middle/end
     #  * maximize importance
-    def get_segment(self, length, method):
-        pass
+    def get_segment(self, length, method='mif_center'):
+        if length > self.get_frame_count():
+            # Todo: what to we do?
+            return None
+
+        mif = self.get_mif()
+        start = 0
+        end = self.get_frame_count()
+
+        if method == 'mif_beginning':
+            start = mif
+            end = mif + length
+        elif method == 'mif_center':
+            start = int(mif - (length / 2))
+            end = start + length
+        elif method == 'mif_end':
+            end = mif
+            start = mif - length
+
+        segment = (start, end)
+        segment = self._shift_segment(segment)
+
+        return segment
