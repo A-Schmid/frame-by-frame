@@ -7,7 +7,7 @@ import pandas as pd
 from softmax_rdm import create_heatmap, generate_distance_vector
 import numpy as np
 
-from hca import hca, create_cophenets_graph, calculate_silhouette, create_silhouette_graph
+from hca import hca, create_cophenets_graph, calculate_silhouette, create_silhouette_graph, hierarchical_clustering, create_nested_category_list, create_dendogram
 
 handlers = []
 
@@ -29,3 +29,12 @@ cophenets = hca(distance_vector)
 silhouette = calculate_silhouette(distance_vector)
 
 #create_silhouette_graph(silhouette, save_path=f'{config.IMAGE_PATH}/silhouette_graph.pdf')
+
+labels, Z = hierarchical_clustering(distance_vector, silhouette, 'ward')
+
+nested_categories = create_nested_category_list(categories, labels)
+
+df_nested_clusters = pd.DataFrame(nested_categories)
+df_nested_clusters.to_csv(f'{config.DATA_PATH}/nested_clusters_{len(labels)}.csv')
+
+create_dendogram(categories, Z, save_path=f'{config.IMAGE_PATH}/dendogram.pdf')

@@ -45,7 +45,7 @@ def create_cophenets_graph(cophenets, save_path=None):
 
 
 def calculate_silhouette(features, linkage='ward', metric='precomputed'):
-    silhouettes = []
+    silhouette = []
 
     # Todo: magic numbers
     for N in range(50,260):
@@ -55,13 +55,13 @@ def calculate_silhouette(features, linkage='ward', metric='precomputed'):
         silhouette_coef = metrics.silhouette_score(features,
                                                    labels=model.labels_,
                                                    metric=metric)
-        silhouettes.append({'N' : N, 'coefficient' : silhouette_coef})
+        silhouette.append({'N' : N, 'coefficient' : silhouette_coef})
 
-    return silhouettes
+    return silhouette
 
 
-def create_silhouette_graph(silhouettes, linkage='ward', save_path=None):
-    df = pd.DataFrame(silhouettes)
+def create_silhouette_graph(silhouette, linkage='ward', save_path=None):
+    df = pd.DataFrame(silhouette)
 
     fig, axes = plt.subplots(num='Silhouette\'s Idx')
 
@@ -74,6 +74,65 @@ def create_silhouette_graph(silhouettes, linkage='ward', save_path=None):
 
     plt.legend()
     plt.title('Silhouette\'s Idx for {linkage} linkage')
+    #plt.show()
+    if save_path is not None:
+        plt.savefig(save_path, layout='thight')
+
+
+def hierarchical_clustering(features, silhouette, linkage):
+    # Todo: there has to be a nicer way to do this
+    # maybe just use a data frame?
+    max_coefficient = silhouette[0]['coefficient']
+    max_coefficient_index = 0
+    for i in range(len(silhouette)):
+        if silhouette[i]['coefficient'] > max_coefficient:
+            max_coefficient = silhouette[i]['coefficient']
+            max_coefficient_index = i
+
+    model = cluster.AgglomerativeClustering(n_clusters=max_coefficient_index,
+                                            #affinity='precomputed',
+                                            linkage=linkage, #'ward', #'complete',
+                                            distance_threshold=None)
+    model.fit(features)
+
+    distances, weights = utils.get_distances(features, model, 'max')
+
+    # Todo: what is Z?
+    Z = np.column_stack([model.children_, distances, weights]).astype(float)
+
+    return model.labels_, Z
+
+def create_nested_category_list(categories, labels):
+    l_nested_categories = []
+    categories = np.array(categories)
+
+    for i in range(max(labels)):
+        cat = categories[labels == i]
+        x = []
+        for label in cat:
+            x.append(label)
+            
+        l_nested_categories.append(x)
+
+    return l_nested_categories
+
+def create_dendogram(labels, Z, save_path=None):
+    plt.figure(figsize=(5,20), num='Dendrogram') # AB:Create visualization
+    R = dendrogram(
+                    Z,
+                    orientation='left',
+                    labels=labels,
+                    #truncate_mode='level',
+                    #p=38,
+                    distance_sort='descending',
+                    show_leaf_counts=False,
+                    #leaf_rotation=45,
+                    #color_threshold=1.1, # 1.7
+                    above_threshold_color='lightgray',
+                    show_contracted=True,
+                    #leaf_font_size=3.,
+                    #link_color_func=lambda k: colors[k]
+              )
     #plt.show()
     if save_path is not None:
         plt.savefig(save_path, layout='thight')
