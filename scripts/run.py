@@ -12,10 +12,16 @@ from sklearn import metrics, cluster
 from scipy.cluster.hierarchy import cophenet
 from scipy.spatial.distance import squareform
 
+from time import perf_counter
+
 handlers = []
+
+t_1 = perf_counter()
 
 for video in get_processed_videos():
     handlers.append(VideoHandler(video['category'], video['name']))
+
+t_2 = perf_counter()
 
 #df_videos = handlers_to_df(handlers)
 #print(df_videos)
@@ -29,22 +35,45 @@ for video in get_processed_videos():
 probability_vector = []
 
 categories = VideoHandler.get_categories()
+
+t_3 = perf_counter()
+
 for category in categories:
     row = VideoHandler.get_probability_vector_for_category(category)
     probability_vector.append(row)
+
+t_4 = perf_counter()
 
 df_probability_vector = pd.DataFrame(probability_vector)
 df_probability_vector.set_index('category')
 df_probability_vector = df_probability_vector.sort_values(by=['category'])
 
+t_5 = perf_counter()
+
 #print(df_probability_vector[['category', 'arresting', 'attacking', 'brushing', 'building', 'buying']])
 #print(np.array(df_probability_vector[['category', 'arresting', 'attacking', 'brushing', 'building', 'buying']]))
 
 distance_vector = generate_distance_vector(df_probability_vector)
-create_heatmap(distance_vector, categories)
+
+t_6 = perf_counter()
 
 df_distance = pd.DataFrame(data=distance_vector, columns=categories)
 df_distance.to_csv(f'{config.DATA_PATH}/rdm_average_softmax.csv', index=False)
+
+t_7 = perf_counter()
+
+#create_heatmap(distance_vector, categories)
+
+print(f'{VideoHandler.counter} Videos')
+print(f'{t_7 - t_1} s total')
+print(f'{(t_2 - t_1) * 1000} ms - get videos') 
+print(f'{(t_3 - t_2) * 1000} ms - get categories') 
+print(f'{(t_4 - t_3) * 1000} ms - get probability vectors') 
+print(f'{(t_5 - t_4) * 1000} ms - sort vectors') 
+print(f'{(t_6 - t_5) * 1000} ms - generate distance vector') 
+print(f'{(t_7 - t_6) * 1000} ms - save csv') 
+
+
 
 
 ## HCA
