@@ -51,9 +51,15 @@ class VideoHandler():
     # this one is needed for softmax_rdm
     def get_probability_vector_for_category(category):
         result = []
-        for handler in VideoHandler.handlers.values():
-            if handler.get_category() == category:
-                result.append(handler.get_probabilities())
+
+        videos = VideoHandler.video_data[VideoHandler.video_data['category'] == category]['file_id']
+
+        for video in videos.values:
+            result.append(VideoHandler.handlers[video].get_probabilities())
+
+        #for handler in VideoHandler.handlers.values():
+        #    if handler.get_category() == category:
+        #        result.append(handler.get_probabilities())
 
         df = pd.DataFrame(result)
         df = df.reindex(sorted(df.columns), axis=1)
