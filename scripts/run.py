@@ -21,8 +21,8 @@ handlers = []
 
 t_1 = perf_counter()
 
-for video in get_processed_videos():
-    handlers.append(VideoHandler(video['category'], video['name']))
+#for video in get_processed_videos():
+#    handlers.append(VideoHandler(video['category'], video['name']))
 
 t_2 = perf_counter()
 
@@ -41,15 +41,17 @@ categories = VideoHandler.get_categories()
 
 t_3 = perf_counter()
 
-for category in categories:
-    row = VideoHandler.get_probability_vector_for_category(category)
-    probability_vector.append(row)
+#for category in categories:
+#    row = VideoHandler.get_probability_vector_for_category(category)
+#    probability_vector.append(row)
 
 t_4 = perf_counter()
 
-df_probability_vector = pd.DataFrame(probability_vector)
-df_probability_vector.set_index('category')
-df_probability_vector = df_probability_vector.sort_values(by=['category'])
+df_probability_vector = pd.read_csv('{config.DATA_PATH}/probability_vector.csv')
+
+#df_probability_vector = pd.DataFrame(probability_vector)
+#df_probability_vector.set_index('category')
+#df_probability_vector = df_probability_vector.sort_values(by=['category'])
 
 t_5 = perf_counter()
 
