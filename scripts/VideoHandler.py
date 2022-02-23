@@ -17,7 +17,7 @@ def get_processed_videos(path=config.RESULT_PATH):
 
     for category in categories:
         #files = paths = glob(f'{path}/{category}/*_frame_000.csv')
-        files = [f for f in os.listdir(f'{path}/{category}') if '_frame_000' in f]
+        files = [f for f in os.listdir(f'{path}/{category}')]
 
         #files = subprocess.Popen(f'ls {path}/{category}/*_frame_000.csv', shell=True, stdout=subprocess.PIPE,).stdout
         #files = subprocess.Popen(['ls'], stdout=subprocess.PIPE,).stdout
@@ -25,7 +25,7 @@ def get_processed_videos(path=config.RESULT_PATH):
         names = []
         for f in files:
             #name = f.split('/')[-1].split('_frame')[0]
-            name = str(f).split('_frame')[0]
+            name = str(f).split('.')[0]
 
             #names.append(name)
 
@@ -91,17 +91,21 @@ class VideoHandler():
         self.set_category(category)
         self.set_name(name)
 
+        self.data = pd.read_csv(f'{self.result_path}/{category}/{name}.csv', dtype={'frame' : 'int8', 'action' : 'category'})
+        self._frame_count = self.data['frame'].max()
+
+        self.set_file_id(VideoHandler.counter)
+
         # get list of csv files for the video
-        paths = sorted(glob(f'{self.result_path}/{category}/{name}_frame_*.csv'))
-        self._frame_count = len(paths)
+        #paths = sorted(glob(f'{self.result_path}/{category}/{name}_frame_*.csv'))
+        #self._frame_count = len(paths)
 
         # create data frame for the video by concatenating data for all frames
         # this step takes 100-150 ms on the lab server
-        self.data = pd.concat([pd.read_csv(f, dtype={'file_id' : 'int16', 'action' : 'category'}) for f in paths])
+        #self.data = pd.concat([pd.read_csv(f, dtype={'file_id' : 'int16', 'action' : 'category'}) for f in paths])
 
         #file_id = name.split('_')[-1]
         #self.set_file_id(file_id)
-        self.set_file_id(VideoHandler.counter)
 
         #print(len(self.data.index))
         #print(self.data.head())
