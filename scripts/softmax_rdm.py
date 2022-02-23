@@ -13,7 +13,7 @@ def generate_distance_vector(probability_vector, metric=metric):
     distance_vector = squareform(pdist(np.array(probability_vector), metric=metric))
     return distance_vector
 
-def create_heatmap(distance_vector, categories):
+def create_heatmap(distance_vector, categories, save_path=None):
 
     f, ax = plt.subplots(figsize=(11, 9), num='RDM')
 
@@ -23,7 +23,10 @@ def create_heatmap(distance_vector, categories):
                 xticklabels=categories,
                 yticklabels=categories)
 
-    #plt.yticks(fontsize=8)
-    #plt.xticks(fontsize=8)
+    plt.yticks(fontsize=2)
+    plt.xticks(fontsize=2)
     plt.title('Average Softmax probabilities per MiTv1 category (ResNet50) ')
-    plt.show()
+    #plt.show()
+
+    if save_path is not None:
+        plt.savefig(save_path, layout='thight')

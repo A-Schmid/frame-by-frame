@@ -7,3 +7,4 @@ CUDA_ON = False
 LABEL_PATH = '../models/labels/category_momentsv1.txt'
 RESULT_PATH = '../video_data'
 DATA_PATH = '../data'
+IMAGE_PATH = '../data/img'
