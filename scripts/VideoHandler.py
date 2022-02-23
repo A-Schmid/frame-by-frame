@@ -39,6 +39,7 @@ class VideoHandler():
         return sorted(list(VideoHandler.video_data['category'].unique()))
 
     # returns a list of accuracies of all videos in the given category
+    # Todo: make param a list (example: get all sports-related things) 
     def get_accuracy_for_category(category):
         result = []
         for handler in VideoHandler.handlers.values():
