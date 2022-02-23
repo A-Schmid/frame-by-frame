@@ -35,9 +35,45 @@ def hca(distance_vector):
 def create_cophenets_graph(cophenets, save_path=None):
     df = pd.DataFrame.from_records([cophenets])
 
-    fig, axes = plt.subplots()
+    fig, axes = plt.subplots(num='Cophenetic')
 
     sns.barplot(data=df, ax=axes)
+    plt.title('Cophenetic correlation coefficients for different HC linkages')
+    #plt.show()
+    if save_path is not None:
+        plt.savefig(save_path, layout='thight')
+
+
+def calculate_silhouette(features, linkage='ward', metric='precomputed'):
+    silhouettes = []
+
+    # Todo: magic numbers
+    for N in range(50,260):
+        model = cluster.AgglomerativeClustering(n_clusters=N,
+                                                linkage=linkage)
+        model.fit(features)
+        silhouette_coef = metrics.silhouette_score(features,
+                                                   labels=model.labels_,
+                                                   metric=metric)
+        silhouettes.append({'N' : N, 'coefficient' : silhouette_coef})
+
+    return silhouettes
+
+
+def create_silhouette_graph(silhouettes, linkage='ward', save_path=None):
+    df = pd.DataFrame(silhouettes)
+
+    fig, axes = plt.subplots(num='Silhouette\'s Idx')
+
+    sns.lineplot(data=df, x='N', y='coefficient', marker='o', ax=axes)
+
+    max_coefficient = df['coefficient'].max()
+    for peak in df[df['coefficient'] == max_coefficient]['N'].values:
+        # Todo: round value?
+        plt.axvline(peak, color='red', label=f'max(Silhouette) = {max_coefficient}')
+
+    plt.legend()
+    plt.title('Silhouette\'s Idx for {linkage} linkage')
     #plt.show()
     if save_path is not None:
         plt.savefig(save_path, layout='thight')
