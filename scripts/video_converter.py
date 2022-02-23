@@ -17,6 +17,7 @@ def get_frame_count(video_path):
     return fps
 
 def convert_video(video_path, video_output_path, keep_audio=False, video_fps=25, overwrite=True):
+    print(f'converting {video_path}')
     # if not in overwrite mode: skip
     if os.path.exists(video_output_path):
         if overwrite == False:
@@ -43,6 +44,7 @@ def convert_videos(input_path, output_path, keep_audio=False, video_fps=25, over
     for path, subdirs, files in os.walk(input_path):
         for name in files:
             if name[-3:] == 'mp4':
+                # support other file types
                 category = path.split('/')[-1]
                 file_id = name[:-4].split('_')[-1]
                 video_path = f'{input_path}/{category}/{name}'
