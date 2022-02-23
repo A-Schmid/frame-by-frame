@@ -8,6 +8,7 @@ import subprocess
 
 from time import perf_counter
 
+# about 4 ms on lab server
 def get_processed_videos(path=config.RESULT_PATH):
     categories = os.listdir(path)
     result = []
@@ -112,7 +113,6 @@ class VideoHandler():
         VideoHandler.video_data = VideoHandler.video_data.append(self.to_dict(), ignore_index=True)
         VideoHandler.handlers[self.get_file_id()] = self
         VideoHandler.counter += 1
-
 
     def to_dict(self):
         result = dict()
