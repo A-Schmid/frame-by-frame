@@ -5,6 +5,7 @@ import os
 import numpy as np
 import pandas as pd
 
+# about 4 ms on lab server
 def get_processed_videos(path=config.RESULT_PATH):
     categories = os.listdir(path)
     result = []
