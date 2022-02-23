@@ -29,6 +29,8 @@ def get_processed_videos(path=config.RESULT_PATH):
 
 class VideoHandler():
 
+    counter = 0
+
     # might perform poorly with large data set
     handlers = dict()
     video_data = pd.DataFrame(columns=['name', 'file_id', 'frame_count', 'category', 'accuracy'])
@@ -70,9 +72,11 @@ class VideoHandler():
         self._frame_count = len(paths)
 
         # create data frame for the video by concatenating data for all frames
-        self.data = pd.concat([pd.read_csv(f) for f in paths])
-        file_id = name.split('_')[-1]
-        self.set_file_id(file_id)
+        self.data = pd.concat([pd.read_csv(f, dtype={'file_id' : 'int16', 'action' : 'category'}) for f in paths])
+
+        #file_id = name.split('_')[-1]
+        #self.set_file_id(file_id)
+        self.set_file_id(VideoHandler.counter)
 
         #print(len(self.data.index))
         #print(self.data.head())
@@ -83,6 +87,7 @@ class VideoHandler():
 
         VideoHandler.video_data = VideoHandler.video_data.append(self.to_dict(), ignore_index=True)
         VideoHandler.handlers[self.get_file_id()] = self
+        VideoHandler.counter += 1
 
     def to_dict(self):
         result = dict()
