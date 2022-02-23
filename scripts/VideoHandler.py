@@ -108,6 +108,10 @@ class VideoHandler():
     def get_name(self):
         return self.name
 
+    def get_video_path(self):
+        # Todo
+        pass
+
     def get_probabilities(self):
         #df = self.data[self.data['action'] == self._category]
         #return list(df['probabilities'])
