@@ -173,11 +173,45 @@ class VideoHandler():
         mif = mif_row['frame'].values[0]
         return mif
 
+    def _get_max_probability_segment(self, length):
+        df = self.data[self.data['action'] == self._category]
+
+        max_sum = 0
+        max_sum_index = 0
+
+        for i in range(0, self.get_frame_count() - length - 1):
+            start = i
+            end = i + length
+            df_slice = df[(df['frame'] >= start) & (df['frame'] < end)]
+            probability_sum = df_slice['probability'].sum()
+            if probability_sum > max_sum:
+                max_sum = probability_sum
+                max_sum_index = i
+
+        return (max_sum_index, max_sum_index + length)
+
+    def _get_max_minimum_segment(self, length):
+        df = self.data[self.data['action'] == self._category]
+
+        max_minimum = 0
+        max_minimum_index = 0
+
+        for i in range(0, self.get_frame_count() - length - 1):
+            start = i
+            end = i + length
+            df_slice = df[(df['frame'] >= start) & (df['frame'] < end)]
+            probability_min = df_slice['probability'].min()
+            if probability_min > max_minimum:
+                max_minimum = probability_min
+                max_minimum_index = i
+
+        return (max_minimum_index, max_minimum_index + length)
+
     # maybe move to util?
     def _shift_segment(self, segment):
         (start, end) = segment
         underflow = 0 - start
-        overflow = (self.get_frame_count() - 1) - end
+        overflow = (end - 1) - self.get_frame_count()
 
         if underflow > 0:
             end += underflow
@@ -192,6 +226,7 @@ class VideoHandler():
     # can use different algorithms:
     #  * mif in the beginning/middle/end
     #  * maximize importance
+    #  * maximize minimum importance
     def get_segment(self, length, method='mif_center'):
         if length > self.get_frame_count():
             # Todo: what to we do?
@@ -210,6 +245,10 @@ class VideoHandler():
         elif method == 'mif_end':
             end = mif
             start = mif - length
+        elif method == 'max_probability':
+            start, end = self._get_max_probability_segment(length)
+        elif method == 'max_minimum':
+            start, end = self._get_max_minimum_segment(length)
 
         segment = (start, end)
         segment = self._shift_segment(segment)
