@@ -241,15 +241,25 @@ class VideoHandler():
 
         max_minimum = 0
         max_minimum_index = 0
+        max_sum = 0
 
         for i in range(0, self.get_frame_count() - length - 1):
             start = i
             end = i + length
             df_slice = df[(df['frame'] >= start) & (df['frame'] < end)]
             probability_min = df_slice['probability'].min()
+
+            # rule 1: maximize minimum
             if probability_min > max_minimum:
                 max_minimum = probability_min
                 max_minimum_index = i
+                max_sum = df_slice['probability'].sum()
+            # rule 2: maxmize probability sum
+            elif probability_min == max_minimum:
+                probability_sum = df_slice['probability'].sum()
+                if probability_sum > max_sum:
+                    max_sum = probability_sum
+                    max_minimum_index = i
 
         return (max_minimum_index, max_minimum_index + length)
 
@@ -257,7 +267,7 @@ class VideoHandler():
     def _shift_segment(self, segment):
         (start, end) = segment
         underflow = 0 - start
-        overflow = (end - 1) - self.get_frame_count()
+        overflow = end - self.get_frame_count() + 1
 
         if underflow > 0:
             end += underflow
