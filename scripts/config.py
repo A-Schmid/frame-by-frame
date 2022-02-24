@@ -8,3 +8,5 @@ LABEL_PATH = '../models/labels/category_momentsv1.txt'
 RESULT_PATH = '../video_data'
 DATA_PATH = '../data'
 IMAGE_PATH = '../data/img'
+HCA_MIN_CLUSTERS = 50
+HCA_MAX_CLUSTERS = 260

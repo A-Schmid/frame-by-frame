@@ -11,6 +11,7 @@ from scipy.cluster.hierarchy import cophenet
 from scipy.spatial.distance import squareform
 
 import utils
+import config
 
 linkage_types = ['ward', 'complete', 'average', 'single']
 
@@ -47,8 +48,7 @@ def create_cophenets_graph(cophenets, save_path=None):
 def calculate_silhouette(features, linkage='ward', metric='precomputed'):
     silhouette = []
 
-    # Todo: magic numbers
-    for N in range(50,260):
+    for N in range(config.HCA_MIN_CLUSTERS, config.HCA_MAX_CLUSTERS):
         model = cluster.AgglomerativeClustering(n_clusters=N,
                                                 linkage=linkage)
         model.fit(features)
