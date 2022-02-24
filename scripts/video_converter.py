@@ -33,7 +33,8 @@ def convert_video(video_path, video_output_path, keep_audio=False, video_fps=25,
     stream = ffmpeg.input(video_path)
     if keep_audio == False:
         stream = stream.video
-    stream = ffmpeg.output(stream, video_output_path, vcodec='libx264', framerate=video_fps, loglevel='quiet')
+    stream = stream.filter('fps', fps=video_fps, round='up')
+    stream = ffmpeg.output(stream, video_output_path, vcodec='libx264', loglevel='quiet')
     stream = ffmpeg.overwrite_output(stream)
     ffmpeg.run(stream)
 
