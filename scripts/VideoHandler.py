@@ -54,6 +54,13 @@ class VideoHandler():
 
         return df.to_dict()
 
+    def from_path(path):
+        # Todo: can fail if file in the same directory is specified
+        # solution: use os.getcwd() in this case
+        path_hierarchy = path.split('/')
+        category = path_hierarchy[-2]
+        name = path_hierarchy[-1].split('.')[0]
+        return VideoHandler(category, name)
 
     def __init__(self, category, name):
         self.load_config()
@@ -127,6 +134,11 @@ class VideoHandler():
     def get_total_accuracy(self, average=np.mean):
         df = self.data[self.data['action'] == self._category]
         accuracy = average(df['probability'])
+        return accuracy
+
+    def get_accuracy_curve(self):
+        df = self.data[self.data['action'] == self._category]
+        accuracy = df[['frame', 'probability']]
         return accuracy
 
     def load_config(self):
