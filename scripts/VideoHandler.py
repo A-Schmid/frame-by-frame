@@ -67,6 +67,7 @@ class VideoHandler():
         self.load_config()
         self.set_category(category)
         self.set_name(name)
+        self._video_path = f'{self._video_base_path}/{category}/{name}.mp4'
         self._path = f'{self.result_path}/{category}/{name}.csv'
         self._video_info = None
 
@@ -119,11 +120,11 @@ class VideoHandler():
         return self.name
 
     def get_video_path(self):
-        return self._path
+        return self._video_path
 
     def get_video_info(self):
         if self._video_info is None:
-            self._video_info = get_video_info(self._path)
+            self._video_info = get_video_info(self._video_path)
         return self._video_info
 
     def get_fps(self):
@@ -148,18 +149,25 @@ class VideoHandler():
     # get accuracy for the whole video
     # accuracies for all frames are averaged with the passed method (default: mean)
     # the passed average function has to take a pandas series as an argument
-    def get_total_accuracy(self, category=self._category, average=np.mean):
+    def get_total_accuracy(self, category=None, average=np.mean):
+        if category is None:
+            category = self._category
+
         df = self.data[self.data['action'] == category]
         accuracy = average(df['probability'])
         return accuracy
 
-    def get_accuracy_curve(self, category=self._category):
+    def get_accuracy_curve(self, category=None):
+        if category is None:
+            category = self._category
+
         df = self.data[self.data['action'] == category]
         accuracy = df[['frame', 'probability']]
         return accuracy
 
     def load_config(self):
         self.set_result_path(config.RESULT_PATH)
+        self._video_base_path = config.VIDEO_OUTPUT_PATH
 
     #def add_video(self, path):
     #    pass
@@ -196,14 +204,20 @@ class VideoHandler():
 
     # returns the most important frame for specified file
     # Todo: split up into multiple private functions as more methods are added
-    def get_mif(self):
-        df = self.data[self.data['action'] == self._category]
+    def get_mif(self, category=None):
+        if category is None:
+            category = self._category
+
+        df = self.data[self.data['action'] == category]
         mif_row = df.loc[df['probability'] == df['probability'].max()]
         mif = mif_row['frame'].values[0]
         return mif
 
-    def _get_max_probability_segment(self, length):
-        df = self.data[self.data['action'] == self._category]
+    def _get_max_probability_segment(self, length, category=None):
+        if category is None:
+            category = self._category
+
+        df = self.data[self.data['action'] == category]
 
         max_sum = 0
         max_sum_index = 0
@@ -219,8 +233,11 @@ class VideoHandler():
 
         return (max_sum_index, max_sum_index + length)
 
-    def _get_max_minimum_segment(self, length):
-        df = self.data[self.data['action'] == self._category]
+    def _get_max_minimum_segment(self, length, category=None):
+        if category is None:
+            category = self._category
+
+        df = self.data[self.data['action'] == category]
 
         max_minimum = 0
         max_minimum_index = 0
@@ -256,12 +273,15 @@ class VideoHandler():
     #  * mif in the beginning/middle/end
     #  * maximize importance
     #  * maximize minimum importance
-    def get_segment(self, length, method='mif_center'):
+    def get_segment(self, length, method='mif_center', category=None):
+        if category is None:
+            category = self._category
+
         if length > self.get_frame_count():
             # Todo: what to we do?
             return None
 
-        mif = self.get_mif()
+        mif = self.get_mif(category)
         start = 0
         end = self.get_frame_count()
 
@@ -275,9 +295,9 @@ class VideoHandler():
             end = mif
             start = mif - length
         elif method == 'max_probability':
-            start, end = self._get_max_probability_segment(length)
+            start, end = self._get_max_probability_segment(length, category)
         elif method == 'max_minimum':
-            start, end = self._get_max_minimum_segment(length)
+            start, end = self._get_max_minimum_segment(length, category)
 
         segment = (start, end)
         segment = self._shift_segment(segment)

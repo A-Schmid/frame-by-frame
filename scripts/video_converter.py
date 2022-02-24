@@ -16,7 +16,7 @@ def get_video_info(video_path):
     video_info = next(s for s in probe['streams'] if s['codec_type'] == 'video')
 
     frame_count = int(video_info['nb_frames'].split('/')[0])
-    fps = int(video_info['r_frame_rate'])
+    fps = float(eval(video_info['r_frame_rate']))
     duration = float(video_info['duration'])
     width = int(video_info['width'])
     height = int(video_info['height'])
