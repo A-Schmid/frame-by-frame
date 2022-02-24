@@ -10,12 +10,29 @@ import pandas as pd
 # 1. return dataframe with videos?
 # 2. support other video formats than mp4?
 
+def get_video_info(video_path):
+    # source: Rosario Scavo (CodeHunter) - https://www.codegrepper.com/code-examples/python/python+ffmpeg+get+video+fps
+    probe = ffmpeg.probe(video_path)
+    video_info = next(s for s in probe['streams'] if s['codec_type'] == 'video')
+
+    frame_count = int(video_info['nb_frames'].split('/')[0])
+    fps = int(video_info['r_frame_rate'])
+    duration = float(video_info['duration'])
+    width = int(video_info['width'])
+    height = int(video_info['height'])
+    return {'frame_count' : frame_count,
+            'fps' : fps,
+            'duration' : duration,
+            'width' : width,
+            'height' : height}
+
+# deprecated
 def get_frame_count(video_path):
     # source: Rosario Scavo (CodeHunter) - https://www.codegrepper.com/code-examples/python/python+ffmpeg+get+video+fps
     probe = ffmpeg.probe(video_path)
     video_info = next(s for s in probe['streams'] if s['codec_type'] == 'video')
-    fps = int(video_info['nb_frames'].split('/')[0])
-    return fps
+    frame_count = int(video_info['nb_frames'].split('/')[0])
+    return frame_count
 
 def convert_video(video_path, video_output_path, keep_audio=False, video_fps=25, overwrite=True):
     print(f'converting {video_path}')

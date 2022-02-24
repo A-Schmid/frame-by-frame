@@ -3,6 +3,7 @@ from glob import glob
 import os
 import numpy as np
 import pandas as pd
+from video_converter import get_video_info
 
 def get_processed_videos(path=config.RESULT_PATH):
     categories = os.listdir(path)
@@ -66,9 +67,11 @@ class VideoHandler():
         self.load_config()
         self.set_category(category)
         self.set_name(name)
+        self._path = f'{self.result_path}/{category}/{name}.csv'
+        self._video_info = None
 
         # read video data
-        self.data = pd.read_csv(f'{self.result_path}/{category}/{name}.csv', dtype={'frame' : 'int8', 'action' : 'category'})
+        self.data = pd.read_csv(self._path, dtype={'frame' : 'int8', 'action' : 'category'})
         self._frame_count = self.data['frame'].max()
 
         # file ID is currently static and only based on the order VideoHandler objects are created
@@ -116,8 +119,23 @@ class VideoHandler():
         return self.name
 
     def get_video_path(self):
-        # Todo
-        pass
+        return self._path
+
+    def get_video_info(self):
+        if self._video_info is None:
+            self._video_info = get_video_info(self._path)
+        return self._video_info
+
+    def get_fps(self):
+        return self.get_video_info()['fps']
+
+    def get_duration(self):
+        return self.get_video_info()['duration']
+
+    def get_dimensions(self):
+        width = self.get_video_info()['width']
+        height = self.get_video_info()['height']
+        return (width, height)
 
     def get_probabilities(self):
         #df = self.data[self.data['action'] == self._category]
