@@ -138,13 +138,22 @@ class VideoHandler():
         height = self.get_video_info()['height']
         return (width, height)
 
-    def get_probabilities(self):
+    def get_probabilities(self, head=None):
         #df = self.data[self.data['action'] == self._category]
         #return list(df['probabilities'])
-        result = dict()
-        for category in self.data['action'].unique():
-            result[category] = self.data[self.data['action'] == category]['probability'].mean()
-        return result
+
+        #result = dict()
+        #for category in self.data['action'].unique():
+        #    result[category] = self.data[self.data['action'] == category]['probability'].mean()
+        #return result
+
+        means = self.data.groupby(['action'])['probability'].mean()
+        means = means.sort_values(ascending=False)
+
+        if head is not None:
+            means = means.head(head)
+
+        return means.to_dict() 
 
     # get accuracy for the whole video
     # accuracies for all frames are averaged with the passed method (default: mean)
