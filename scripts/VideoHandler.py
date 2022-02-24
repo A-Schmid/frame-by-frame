@@ -145,17 +145,16 @@ class VideoHandler():
             result[category] = self.data[self.data['action'] == category]['probability'].mean()
         return result
 
-
     # get accuracy for the whole video
     # accuracies for all frames are averaged with the passed method (default: mean)
     # the passed average function has to take a pandas series as an argument
-    def get_total_accuracy(self, average=np.mean):
-        df = self.data[self.data['action'] == self._category]
+    def get_total_accuracy(self, category=self._category, average=np.mean):
+        df = self.data[self.data['action'] == category]
         accuracy = average(df['probability'])
         return accuracy
 
-    def get_accuracy_curve(self):
-        df = self.data[self.data['action'] == self._category]
+    def get_accuracy_curve(self, category=self._category):
+        df = self.data[self.data['action'] == category]
         accuracy = df[['frame', 'probability']]
         return accuracy
 
