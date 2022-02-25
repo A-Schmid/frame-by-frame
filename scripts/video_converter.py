@@ -13,6 +13,20 @@ def extract_video_segment(video_path, output_path, start_frame, end_frame):
     stream = ffmpeg.overwrite_output(stream)
     ffmpeg.run(stream)
 
+def get_frame_from_video(video_path, output_path, frame_num):
+    info = get_video_info(video_path)
+    fps = info['fps']
+    frame_timestamp = frame_num / fps
+    duration = info['duration']
+    if frame_timestamp > duration:
+        # Todo: exception
+        print(f'Error. Could not extract frame {frame_num} from video with {duration * fps} frames.')
+        return None
+    else:
+        stream = ffmpeg.input(video_path, ss=frame_timestamp)
+        stream = stream.output(output_path, vframes=1, pix_fmt='rgb24', loglevel='quiet')
+        ffmpeg.run(stream)
+
 # AS:
 # 1. return dataframe with videos?
 # 2. support other video formats than mp4?
