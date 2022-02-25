@@ -15,6 +15,8 @@ from model import calculate_probabilities, load_categories
 from time import perf_counter
 
 def process_video(video, result_path=config.RESULT_PATH, process=calculate_probabilities):
+    # load categories
+    categories = load_categories(config.LABEL_PATH)
     reader = VideoReader(video['path'])
     frames = reader.get_batch([i for i in range(len(reader))])
 
@@ -49,9 +51,6 @@ def process_video(video, result_path=config.RESULT_PATH, process=calculate_proba
     return True
 
 if __name__ == '__main__':
-    print('loading categories...')
-    # load categories
-    categories = load_categories(config.LABEL_PATH)
 
     data_path = config.DATA_PATH
 
