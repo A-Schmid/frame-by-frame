@@ -13,6 +13,9 @@ from scipy.spatial.distance import squareform
 import utils
 import config
 
+from collections import defaultdict
+from matplotlib.colors import rgb2hex, colorConverter
+
 linkage_types = ['ward', 'complete', 'average', 'single']
 
 def hca(distance_vector):
@@ -136,3 +139,24 @@ def create_dendogram(labels, Z, save_path=None):
     #plt.show()
     if save_path is not None:
         plt.savefig(save_path, layout='thight')
+
+    return R
+
+def generate_cluster_index(R):
+    cluster_idxs = defaultdict(list)
+    for c, pi in zip(R['color_list'], R['icoord']):
+        for leg in pi[1:3]:
+            i = (leg - 5.0) / 10.0
+            if abs(i - int(i)) < 1e-5:
+                cluster_idxs[c].append(int(i))
+
+    return cluster_idxs
+
+def get_cluster_classes(cluster_idxs, den, label='ivl'):
+    cluster_classes = dict()
+
+    for c, l in cluster_idxs.items():
+        i_l = [den[label][i] for i in l]
+        cluster_classes[c] = i_l
+
+    return cluster_classes
