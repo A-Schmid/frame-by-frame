@@ -6,6 +6,13 @@ import config
 from pathlib import Path
 import pandas as pd
 
+def extract_video_segment(video_path, output_path, start_frame, end_frame):
+    stream = ffmpeg.input(video_path)
+    stream = stream.trim(start_frame=start_frame, end_frame=end_frame)
+    stream = ffmpeg.output(stream, output_path, loglevel='quiet')
+    stream = ffmpeg.overwrite_output(stream)
+    ffmpeg.run(stream)
+
 # AS:
 # 1. return dataframe with videos?
 # 2. support other video formats than mp4?
