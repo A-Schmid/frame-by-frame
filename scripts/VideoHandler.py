@@ -72,7 +72,7 @@ class VideoHandler():
         self._video_info = None
 
         # read video data
-        self.data = pd.read_csv(self._path, dtype={'frame' : 'int8', 'action' : 'category'})
+        self.data = pd.read_csv(self._path, dtype={'frame' : 'int16', 'action' : 'category'})
         self._frame_count = self.data['frame'].max()
 
         # file ID is currently static and only based on the order VideoHandler objects are created
