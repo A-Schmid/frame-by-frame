@@ -39,7 +39,7 @@ def get_video_info(video_path):
     frame_count = int(video_info['nb_frames'].split('/')[0])
     fps = float(eval(video_info['r_frame_rate']))
     duration = float(video_info['duration'])
-    duration_frames = inf(float(video_info['duration']) * fps)
+    duration_frames = int(float(video_info['duration']) * fps)
     width = int(video_info['width'])
     height = int(video_info['height'])
     return {'frame_count' : frame_count,
@@ -97,6 +97,7 @@ def convert_videos(input_path, output_path, data_path=None, keep_audio=False, vi
                 info = get_video_info(video_output_path)
                 frame_count = info['frame_count']
                 duration = info['duration']
+                duration_frames = info['duration_frames']
                 width = info['width']
                 height = info['height']
                 video_list.append({'file_id' : file_id, 'path' : video_output_path, 'num_frames' : frame_count, 'duration' : duration, 'duration_frames' : duration_frames, 'width' : width, 'height' : height, 'name' : name.rsplit('.', 1)[0], 'category' : category})
