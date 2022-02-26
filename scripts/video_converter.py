@@ -6,7 +6,7 @@ import config
 from pathlib import Path
 import pandas as pd
 
-def extract_video_segment(video_path, output_path, start_frame, end_frame):
+def extract_video_segment(video_path, output_path, start_frame, end_frame, width=None, height=None):
     stream = ffmpeg.input(video_path)
     stream = stream.trim(start_frame=start_frame, end_frame=end_frame)
     stream = ffmpeg.output(stream, output_path, loglevel='quiet')
@@ -39,11 +39,13 @@ def get_video_info(video_path):
     frame_count = int(video_info['nb_frames'].split('/')[0])
     fps = float(eval(video_info['r_frame_rate']))
     duration = float(video_info['duration'])
+    duration_frames = inf(float(video_info['duration']) * fps)
     width = int(video_info['width'])
     height = int(video_info['height'])
     return {'frame_count' : frame_count,
             'fps' : fps,
             'duration' : duration,
+            'duration_frames' : duration_frames,
             'width' : width,
             'height' : height}
 
@@ -92,8 +94,12 @@ def convert_videos(input_path, output_path, data_path=None, keep_audio=False, vi
                 video_path = f'{input_path}/{category}/{name}'
                 video_output_path = f'{output_path}/{category}/{name}'
                 convert_video(video_path, video_output_path, keep_audio, video_fps, overwrite)
-                frame_count = get_frame_count(video_output_path)
-                video_list.append({'file_id' : file_id, 'path' : video_output_path, 'num_frames' : frame_count, 'name' : name.rsplit('.', 1)[0], 'category' : category})
+                info = get_video_info(video_output_path)
+                frame_count = info['frame_count']
+                duration = info['duration']
+                width = info['width']
+                height = info['height']
+                video_list.append({'file_id' : file_id, 'path' : video_output_path, 'num_frames' : frame_count, 'duration' : duration, 'duration_frames' : duration_frames, 'width' : width, 'height' : height, 'name' : name.rsplit('.', 1)[0], 'category' : category})
                 counter += 1
     #df_videos = pd.DataFrame(columns=['file_id', 'path', 'frame_count', 'name', 'category'])
     df_videos = pd.DataFrame(video_list)
