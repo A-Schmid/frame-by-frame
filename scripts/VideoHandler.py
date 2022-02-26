@@ -92,6 +92,7 @@ class VideoHandler():
         result['frame_count'] = self.get_frame_count()
         result['category'] = self.get_category()
         result['accuracy'] = self.get_total_accuracy()
+        result['mif_index'] = self.get_mif()
         return result
 
     def set_category(self, category):
