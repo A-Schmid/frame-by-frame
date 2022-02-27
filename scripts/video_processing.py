@@ -14,6 +14,8 @@ from model import calculate_probabilities, load_categories
 
 from time import perf_counter
 
+import VideoHandler
+
 def process_video(video, result_path=config.RESULT_PATH, process=calculate_probabilities):
     # load categories
     categories = load_categories(config.LABEL_PATH)
