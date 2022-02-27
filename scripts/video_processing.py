@@ -63,27 +63,52 @@ def get_processed_videos(path=config.RESULT_PATH):
             result.append({'name' : name, 'category' : category})
 
     return result
+
+def create_processed_video_list(path_videos_processed=config.RESULT_PATH, output_path=f'{config.DATA_PATH}/videos_processed.csv'):
+    videos = get_processed_videos(path_videos_processed)
+    videos_processed_list = []
+
+    for processed_video in videos:
+        handler = VideoHandler(processed_video['category'], process_video['name'])
+        video = handler.to_dict()
+        videos_processed_list.append(video)
+
+    df_videos_processed = pd.DataFrame(videos_processed_list)
+    df_videos_processed.to_csv('{data_path}/videos_processed.csv')
+
 if __name__ == '__main__':
 
     data_path = config.DATA_PATH
 
     # todo support args
     path_videos_converted = f'{data_path}/videos_converted.csv'
+    path_videos_processed = f'{data_path}/videos_processed.csv'
 
-    #video_list = convert_videos(input_path=config.VIDEO_PATH, output_path=config.VIDEO_OUTPUT_PATH, keep_audio=config.KEEP_AUDIO, video_fps=config.VIDEO_FPS, overwrite=False)
+    df_videos_converted = pd.read_csv(path_videos_converted)
+    df_videos_processed = pd.read_csv(path_videos_processed)
 
-    df_videos = pd.read_csv(path_videos_converted)
-    video_list = df_videos.to_dict('records')
+    df_videos_converted = df_videos_converted[~df_videos_converted['name'].isin(df_videos_processed['name'])]
 
-    print('doing magic...')
+    videos_converted_list = df_videos_converted.to_dict('records')
+
+    print('calculating probabilities...')
 
     counter = 0
 
-    for video in video_list:
+    for video in videos_converted_list:
         print(f'{video["path"]} {counter+1}/{len(video_list)}')
+
+        ## Todo: drop videos from video list before even going into the loop
+        #if video['name'] in df_videos_processed['name']:
+        #    print('already processed - skip...')
+        #    continue
+
         start = perf_counter()
         b = process_video(video, result_path=config.RESULT_PATH, process=calculate_probabilities)
         end = perf_counter()
         if b == True:
             print((end-start))
         counter += 1
+
+    print('creating list of processed videos...')
+    create_processed_video_list()
