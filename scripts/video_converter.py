@@ -82,15 +82,12 @@ def convert_video(video_path, video_output_path, keep_audio=False, video_fps=25,
 
 def convert_videos(input_path, output_path, data_path=None, keep_audio=False, video_fps=25, overwrite=True):
     video_list = []
-    counter = 0
     # maybe dataframe is the better idea?
     for path, subdirs, files in os.walk(input_path):
         for name in files:
             if name[-3:] == 'mp4':
                 # support other file types
                 category = path.split('/')[-1]
-                #file_id = name[:-4].split('_')[-1]
-                file_id = counter
                 video_path = f'{input_path}/{category}/{name}'
                 video_output_path = f'{output_path}/{category}/{name}'
                 convert_video(video_path, video_output_path, keep_audio, video_fps, overwrite)
@@ -100,9 +97,7 @@ def convert_videos(input_path, output_path, data_path=None, keep_audio=False, vi
                 duration_frames = info['duration_frames']
                 width = info['width']
                 height = info['height']
-                video_list.append({'file_id' : file_id, 'path' : video_output_path, 'num_frames' : frame_count, 'duration' : duration, 'duration_frames' : duration_frames, 'width' : width, 'height' : height, 'name' : name.rsplit('.', 1)[0], 'category' : category})
-                counter += 1
-    #df_videos = pd.DataFrame(columns=['file_id', 'path', 'frame_count', 'name', 'category'])
+                video_list.append({'path' : video_output_path, 'num_frames' : frame_count, 'duration' : duration, 'duration_frames' : duration_frames, 'width' : width, 'height' : height, 'name' : name.rsplit('.', 1)[0], 'category' : category})
     df_videos = pd.DataFrame(video_list)
     if data_path is not None:
         df_videos.to_csv(f'{data_path}/videos_converted.csv', index=False)
