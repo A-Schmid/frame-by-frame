@@ -76,7 +76,7 @@ def create_processed_video_list(path_videos_processed=config.RESULT_PATH, output
         videos_processed_list.append(video)
 
     df_videos_processed = pd.DataFrame(videos_processed_list)
-    df_videos_processed.to_csv('{data_path}/videos_processed.csv')
+    df_videos_processed.to_csv('{config.DATA_PATH}/videos_processed.csv')
 
 if __name__ == '__main__':
 
