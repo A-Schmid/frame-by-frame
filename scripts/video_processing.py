@@ -14,7 +14,7 @@ from model import calculate_probabilities, load_categories
 
 from time import perf_counter
 
-import VideoHandler
+from VideoHandler import VideoHandler
 
 def process_video(video, result_path=config.RESULT_PATH, process=calculate_probabilities):
     # load categories
@@ -71,7 +71,7 @@ def create_processed_video_list(path_videos_processed=config.RESULT_PATH, output
     videos_processed_list = []
 
     for processed_video in videos:
-        handler = VideoHandler(processed_video['category'], process_video['name'])
+        handler = VideoHandler(processed_video['category'], processed_video['name'])
         video = handler.to_dict()
         videos_processed_list.append(video)
 
