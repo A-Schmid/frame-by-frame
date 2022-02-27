@@ -76,12 +76,27 @@ class VideoHandler():
     # returns summary of the VideoHandler object as a dict
     def to_dict(self):
         result = dict()
-        result['name'] = self.get_name()
+
+        info = self.get_video_info()
+
+        best_category = self.get_probabilities(1)
+
         result['file_id'] = self.get_file_id()
+        result['name'] = self.get_name()
+        result['path'] = self.get_video_path()
         result['frame_count'] = self.get_frame_count()
         result['category'] = self.get_category()
         result['accuracy'] = self.get_total_accuracy()
         result['mif_index'] = self.get_mif()
+
+        result['duration'] = info['duration']
+        result['duration_frames'] = info['duration_frames']
+        result['fps'] = info['fps']
+        result['width'] = info['width']
+        result['height'] = info['height']
+
+        result['best_category'] = best_category.keys()[0]
+        result['best_category_accuracy'] = best_category.values()[0]
         return result
 
     def set_category(self, category):
