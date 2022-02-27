@@ -10,3 +10,4 @@ DATA_PATH = '../data'
 IMAGE_PATH = '../data/img'
 HCA_MIN_CLUSTERS = 50
 HCA_MAX_CLUSTERS = 260
+MIF_PATH = '../MIF'

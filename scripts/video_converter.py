@@ -25,6 +25,7 @@ def get_frame_from_video(video_path, output_path, frame_num):
     else:
         stream = ffmpeg.input(video_path, ss=frame_timestamp)
         stream = stream.output(output_path, vframes=1, pix_fmt='rgb24', loglevel='quiet')
+        stream = ffmpeg.overwrite_output(stream)
         ffmpeg.run(stream)
 
 # AS:
