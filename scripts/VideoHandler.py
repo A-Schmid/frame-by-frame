@@ -95,8 +95,8 @@ class VideoHandler():
         result['width'] = info['width']
         result['height'] = info['height']
 
-        result['best_category'] = best_category.keys()[0]
-        result['best_category_accuracy'] = best_category.values()[0]
+        result['best_category'] = list(best_category.keys())[0]
+        result['best_category_accuracy'] = list(best_category.values())[0]
         return result
 
     def set_category(self, category):
