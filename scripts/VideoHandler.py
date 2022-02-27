@@ -49,7 +49,7 @@ class VideoHandler():
         name = path_hierarchy[-1].split('.')[0]
         return VideoHandler(category, name)
 
-    def __init__(self, category, name):
+    def __init__(self, category, name, file_id=None):
         self.load_config()
         self.set_category(category)
         self.set_name(name)
@@ -63,7 +63,10 @@ class VideoHandler():
 
         # file ID is currently static and only based on the order VideoHandler objects are created
         # Todo: make it an argument and use IDs from file list
-        self.set_file_id(VideoHandler.counter)
+        if not file_id:
+            self.set_file_id(VideoHandler.counter)
+        else:
+            self.set_file_id(file_id)
 
         # set static variables
         VideoHandler.video_data = VideoHandler.video_data.append(self.to_dict(), ignore_index=True)
