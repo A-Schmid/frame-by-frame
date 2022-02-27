@@ -50,6 +50,19 @@ def process_video(video, result_path=config.RESULT_PATH, process=calculate_proba
     df.to_csv(f'{result_path}/{video["category"]}/{video["name"]}.csv', index=False)
     return True
 
+def get_processed_videos(path=config.RESULT_PATH):
+    categories = os.listdir(path)
+    result = []
+
+    for category in categories:
+        files = [f for f in os.listdir(f'{path}/{category}')]
+        names = []
+
+        for f in files:
+            name = str(f).split('.')[0]
+            result.append({'name' : name, 'category' : category})
+
+    return result
 if __name__ == '__main__':
 
     data_path = config.DATA_PATH

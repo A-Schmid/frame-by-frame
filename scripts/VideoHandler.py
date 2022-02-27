@@ -5,20 +5,6 @@ import numpy as np
 import pandas as pd
 from video_converter import get_video_info
 
-def get_processed_videos(path=config.RESULT_PATH):
-    categories = os.listdir(path)
-    result = []
-
-    for category in categories:
-        files = [f for f in os.listdir(f'{path}/{category}')]
-        names = []
-
-        for f in files:
-            name = str(f).split('.')[0]
-            result.append({'name' : name, 'category' : category})
-
-    return result
-
 class VideoHandler():
     counter = 0
 

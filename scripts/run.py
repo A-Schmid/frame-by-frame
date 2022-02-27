@@ -2,7 +2,8 @@ import warnings
 warnings.filterwarnings("ignore")
 
 import config
-from VideoHandler import get_processed_videos, VideoHandler
+from VideoHandler import VideoHandler
+from video_processing import get_processed_videos
 import pandas as pd
 from softmax_rdm import create_heatmap, generate_distance_vector
 import numpy as np
